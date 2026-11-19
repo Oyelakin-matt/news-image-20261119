@@ -17,6 +17,7 @@ DST = os.path.join(os.environ.get("MAKEFUN_OUTPUT_DIR", "/output"), "entry.png")
 
 PNG_MAGIC = b"\x89PNG\r\n\x1a\n"
 PNG_IEND = b"IEND"
+MAX_BYTES = 1048576  # the gate caps the image at 1 MiB
 
 
 def main():
@@ -26,6 +27,8 @@ def main():
         sys.exit("entry.png is not a PNG")
     if PNG_IEND not in data[-12:]:
         sys.exit("entry.png has no IEND chunk")
+    if len(data) > MAX_BYTES:
+        sys.exit(f"entry.png is {len(data)} bytes, over the 1 MiB cap")
     os.makedirs(os.path.dirname(DST), exist_ok=True)
     shutil.copyfile(SRC, DST)
 
